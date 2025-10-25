@@ -1,55 +1,132 @@
 package com.example.demo.controller;
 
+import com.example.demo.Character;
+import com.example.demo.Mobs;
+import com.example.demo.service.AbilitiesService;
 import com.example.demo.service.CharactersService;
+import com.example.demo.service.MobsService;
+import com.example.demo.Abilities;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping()
 public class Base {
+
     @Autowired
     private CharactersService charactersService;
 
-    @GetMapping("/hell")
-    public ResponseEntity<List<Character>> getAllCharacters(){
-        List<Character> characters = charactersService.getAllCharacters();
+    @Autowired
+    private AbilitiesService abilitiesService;
+
+    @Autowired
+    private MobsService mobsService;
+
+
+    @GetMapping("/test")
+    public String test() {
+        return "Hello World";
+    }
+
+    @GetMapping("/A/abilities")
+    public ResponseEntity<List<Abilities>> getAllAbilities() {
+        List<Abilities> abilities = abilitiesService.findAllAbilities();
+        return ResponseEntity.ok(abilities);
+    }
+
+    @GetMapping("/A/names")
+    public ResponseEntity<List<Abilities.AbilitiesIdName>> getAllAbilitiesName() {
+        List<Abilities.AbilitiesIdName> abilities = abilitiesService.findNames();
+        return ResponseEntity.ok(abilities);
+    }
+
+    @PostMapping("/A")
+    public ResponseEntity<Abilities> createAbility(@RequestBody Abilities ability) {
+        Abilities created = abilitiesService.appAbility(ability);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+
+    @DeleteMapping("/A/{id}")
+    public ResponseEntity<Void> deleteAbility(@PathVariable Long id) {
+        try {
+            abilitiesService.deletAbility(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/C/hell")
+    public ResponseEntity<List<com.example.demo.Character>> getAllCharacters() {
+        List<com.example.demo.Character> characters = charactersService.getAllCharacters();
         return ResponseEntity.ok(characters);
     }
 
-    @GetMapping("/names")
-    public ResponseEntity<List<Character.CharacterIdName>> getAllName(){
-        List<Character.CharacterIdName> characters = charactersService.getAllNames();
+    @GetMapping("/C/names")
+    public ResponseEntity<List<com.example.demo.Character.CharacterIdName>> getAllName() {
+        List<com.example.demo.Character.CharacterIdName> characters = charactersService.getAllNames();
         return ResponseEntity.ok(characters);
     }
 
-    @PostMapping
-    public ResponseEntity<Character> createUser(@RequestBody Character user) {
-        Character createdUser = charactersService.appCharacter(user);
+    @PostMapping("/C")
+    public ResponseEntity<com.example.demo.Character> createUser(@RequestBody com.example.demo.Character user) {
+        com.example.demo.Character createdUser = charactersService.appCharacter(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Character> updateUser(@PathVariable Long id, @RequestBody Character userDetails) {
+    @PutMapping("/C/{id}")
+    public ResponseEntity<com.example.demo.Character> updateUser(@PathVariable Long id, @RequestBody com.example.demo.Character userDetails) {
         try {
             Character updatedUser = charactersService.updateCharacter(id, userDetails);
             return ResponseEntity.ok(updatedUser);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build(); 
+            return ResponseEntity.notFound().build();
         }
     }
-    @DeleteMapping("/{id}")
+
+    @DeleteMapping("/C/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
             charactersService.deletCharacter(id);
-            return ResponseEntity.noContent().build(); 
+            return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build(); 
+            return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/M/mobs")
+    public ResponseEntity<List<Mobs>> getAllMobs() {
+        List<Mobs> mobs = mobsService.findAllMobs();
+        return ResponseEntity.ok(mobs);
+    }
+
+    @GetMapping("/M/names")
+    public ResponseEntity<List<Mobs.MobsIdName>> getAllMobsName() {
+        List<Mobs.MobsIdName> mobs = mobsService.findNames();
+        return ResponseEntity.ok(mobs);
+    }
+
+    @PostMapping("/M")
+    public ResponseEntity<Mobs> createMobs(@RequestBody Mobs mobs) {
+        Mobs created = mobsService.appMobs(mobs);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+
+    @DeleteMapping("/M/{id}")
+    public ResponseEntity<Void> deleteMobs(@PathVariable Long id) {
+        try {
+            mobsService.deletMobs(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
 }
