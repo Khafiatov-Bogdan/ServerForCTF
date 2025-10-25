@@ -29,7 +29,7 @@ public class Base {
 
     @GetMapping("/test")
     public String test() {
-        return "Hello World";
+        return "Привет, Кирилл. Как дела?";
     }
 
     @GetMapping("/A/abilities")
