@@ -43,7 +43,7 @@ public class Base {
 
     @GetMapping("/forDima")
     public String Dima() {
-        return "Отдай отмычку, чёрт";
+        return "Пиривет. Я пиздец заёбся, но сделал";
     }
     @GetMapping("/forYarick")
     public String Yarick() {
