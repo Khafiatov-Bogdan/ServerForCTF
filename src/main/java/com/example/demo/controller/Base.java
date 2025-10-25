@@ -36,6 +36,10 @@ public class Base {
     public String mmm() {
         return "Привет, Милана. Я даже не написал что ты жопа))";
     }
+    @GetMapping("/forRoma")
+    public String mmm() {
+        return "Отдай отмычку, чёрт";
+    }
 
     @GetMapping("/A/abilities")
     public ResponseEntity<List<Abilities>> getAllAbilities() {
