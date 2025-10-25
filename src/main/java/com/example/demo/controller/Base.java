@@ -46,11 +46,11 @@ public class Base {
         return "Пиривет. /(.)(.)\";
     }
     @GetMapping("/forYarick")
-    public String Dima() {
+    public String Yarick() {
         return "Пиривет. В Москву едешь в итоге?";
     }
     @GetMapping("/forVadim")
-    public String Dima() {
+    public String Vadim() {
         return "Вот над чем я сидел сегодня весь день";
     }
 
