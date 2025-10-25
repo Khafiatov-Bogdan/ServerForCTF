@@ -32,6 +32,11 @@ public class Base {
         return "Привет, Кирилл. Как дела?";
     }
 
+    @GetMapping("/forMilana")
+    public String test() {
+        return "Привет, Милана. Я даже не написал что ты жопа))";
+    }
+
     @GetMapping("/A/abilities")
     public ResponseEntity<List<Abilities>> getAllAbilities() {
         List<Abilities> abilities = abilitiesService.findAllAbilities();
