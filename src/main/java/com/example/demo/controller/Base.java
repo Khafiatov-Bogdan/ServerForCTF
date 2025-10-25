@@ -41,6 +41,25 @@ public class Base {
         return "Отдай отмычку, чёрт";
     }
 
+    @GetMapping("/forDima")
+    public String Dima() {
+        return "Пиривет. /(.)(.)\";
+    }
+    @GetMapping("/forYarick")
+    public String Dima() {
+        return "Пиривет. В Москву едешь в итоге?";
+    }
+    @GetMapping("/forVadim")
+    public String Dima() {
+        return "Вот над чем я сидел сегодня весь день";
+    }
+
+
+
+
+
+    
+
     @GetMapping("/A/abilities")
     public ResponseEntity<List<Abilities>> getAllAbilities() {
         List<Abilities> abilities = abilitiesService.findAllAbilities();
