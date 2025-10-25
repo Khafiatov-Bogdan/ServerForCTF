@@ -33,7 +33,7 @@ public class Base {
     }
 
     @GetMapping("/forMilana")
-    public String test() {
+    public String mmm() {
         return "Привет, Милана. Я даже не написал что ты жопа))";
     }
 
