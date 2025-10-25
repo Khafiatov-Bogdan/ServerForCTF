@@ -37,7 +37,7 @@ public class Base {
         return "Привет, Милана. Я даже не написал что ты жопа))";
     }
     @GetMapping("/forRoma")
-    public String mmm() {
+    public String Roma() {
         return "Отдай отмычку, чёрт";
     }
 
