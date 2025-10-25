@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import java.net.URI;
 
 @Configuration
-public class DataSourceConfig {
+public class DataSourseConfig {
 
     @Value("${DATABASE_URL}")
     private String databaseUrl;
