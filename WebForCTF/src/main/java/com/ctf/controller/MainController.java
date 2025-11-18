@@ -80,8 +80,14 @@ public class MainController {
             @RequestParam String password,
             HttpSession session,
             Model model) {
-
+        if (sessionRegistry.isUserActive(username)) {
+            model.addAttribute("error", "Пользователь уже вошёл в систему в другой сессии");
+            model.addAttribute("isLogin", true);
+            return "auth";
+        }
         try {
+
+
             Logger logger = LoggerFactory.getLogger(MainController.class);
             logger.info("LOGIN ATTEMPT: username={} sessionID={}", username, session.getId());
 

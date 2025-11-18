@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import jakarta.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -20,15 +19,34 @@ public class Users {
     @Column(nullable = false)
     private int points = 0;
 
-
     public Users() {}
 
-    public Users(String login, String password, String role) {
+    public Users(String login, String password, int points) {
         this.login = login;
         this.password = password;
         this.points = points;
     }
 
+    // ======================
+    // DTO для отображения очков
+    // ======================
+    public static class UserNamePointsDTO {
+        private String name;
+        private int points;
+
+        public UserNamePointsDTO(String name, int points) {
+            this.name = name;
+            this.points = points;
+        }
+
+        // геттеры
+        public String getName() { return name; }
+        public int getPoints() { return points; }
+    }
+
+    // ======================
+    // Геттеры и сеттеры
+    // ======================
     public Long getId() { return id; }
 
     public String getLogin() { return login; }
@@ -37,16 +55,15 @@ public class Users {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-
-
     public int getPoints() { return points; }
     public void setPoints(int points) { this.points = points; }
 
     @Override
     public String toString() {
-        return "User{" +
+        return "Users{" +
                 "id=" + id +
                 ", login='" + login + '\'' +
+                ", points=" + points +
                 '}';
     }
 }

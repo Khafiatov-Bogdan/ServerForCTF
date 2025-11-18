@@ -123,6 +123,11 @@ public class Base {
     }
 
 
+    @GetMapping("/allNames")
+    public ResponseEntity<List<Users.UserNamePointsDTO>> getAllNames() {
+        return ResponseEntity.ok(usersService.getAllNames());
+    }
+
 
 
 

@@ -268,30 +268,26 @@ function generateFullLeaderboard() {
     const fullList = document.getElementById('leaderboardFull');
     if (!fullList) return;
 
-    // Запрашиваем активные сессии с сервера
-    fetch('/api/sessions')
+    fetch('http://localhost:8081/allNames') // эндпоинт, который отдаёт UserNamePointsDTO
         .then(response => response.json())
-        .then(sessions => {
+        .then(users => {
             fullList.innerHTML = '';
 
-            if (sessions.length === 0) {
-                fullList.innerHTML = '<div class="no-users-message">Нет активных пользователей</div>';
+            if (!users || users.length === 0) {
+                fullList.innerHTML = '<div class="no-users-message">Нет пользователей</div>';
                 return;
             }
 
-            sessions.forEach((session, index) => {
-                const username = session.username || '(аноним)';
-                const shortId = session.sessionId.substring(0, 8);
-
+            users.forEach((user, index) => {
                 const leaderItem = document.createElement('div');
                 leaderItem.className = 'leader-item';
-                leaderItem.style.animationDelay = `${(index % 10) * 0.1}s`;
+                leaderItem.style.animationDelay = `${index * 0.1}s`;
 
                 leaderItem.innerHTML = `
-                    <div class="leader-rank">•</div>
+                    <div class="leader-rank">${index + 1}</div>
                     <div class="leader-info">
-                        <div class="leader-name">${username}</div>
-                        <div class="leader-stats">session: ${shortId}</div>
+                        <div class="leader-name">${user.name}</div>
+                        <div class="leader-stats">${user.points} pts</div>
                     </div>
                 `;
 
@@ -299,11 +295,10 @@ function generateFullLeaderboard() {
             });
         })
         .catch(error => {
-            console.error('Error fetching active sessions:', error);
+            console.error('Ошибка при получении пользователей:', error);
             fullList.innerHTML = '<div class="no-users-message">Ошибка загрузки данных</div>';
         });
 }
-
 
 function createParticles() {
     const particlesContainer = document.querySelector('.particles');

@@ -22,4 +22,7 @@ public class SessionRegistry {
     public Map<String, String> getActiveSessions() {
         return sessions;
     }
+    public boolean isUserActive(String username) {
+        return sessions.containsValue(username);
+    }
 }

@@ -23,6 +23,10 @@ public class UsersService {
         return usersRepository.findTop3ByOrderByPointsDesc();
     }
 
+    public List<Users.UserNamePointsDTO> getAllNames() {
+        return usersRepository.findAllNames();
+    }
+
 
     /** Регистрация нового пользователя */
     public Users registerUser(String login, String rawPassword) {
