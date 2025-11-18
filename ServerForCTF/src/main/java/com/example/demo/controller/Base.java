@@ -37,34 +37,95 @@ public class Base {
 
 
 
+// ==========================
+//      USERS ENDPOINTS
+// ==========================
 
-    @GetMapping("/forMilana")
-    public String mmm() {
-        return "Привет, Милана. Я даже не написал что ты жопа))";
-    }
-    @GetMapping("/forRoma")
-    public String Roma() {
-        return "Отдай отмычку, чёрт";
-    }
-
-    @GetMapping("/forDima")
-    public String Dima() {
-        return "Пиривет. Я пиздец заёбся, но сделал";
-    }
-    @GetMapping("/forYarick")
-    public String Yarick() {
-        return "Пиривет. В Москву едешь в итоге?";
-    }
-    @GetMapping("/forVadim")
-    public String Vadim() {
-        return "Вот над чем я сидел сегодня весь день";
+    @GetMapping("/users")
+    public ResponseEntity<List<Users>> getAllUsers() {
+        return ResponseEntity.ok(usersService.getAllUsers());
     }
 
+    @GetMapping("/users/{login}")
+    public ResponseEntity<?> getUserByLogin(@PathVariable String login) {
+        return usersService.getUserByLogin(login)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User not found"));
+    }
+
+    @PostMapping("/users/register")
+    public ResponseEntity<?> registerUser(
+            @RequestParam String login,
+            @RequestParam String password) {
+        try {
+            Users created = usersService.registerUser(login, password);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+// =============== POINTS API ===============
+
+    @GetMapping("/users/{login}/points")
+    public ResponseEntity<?> getPoints(@PathVariable String login) {
+        try {
+            int points = usersService.getPoints(login);
+            return ResponseEntity.ok(points);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/users/{login}/points/set/{amount}")
+    public ResponseEntity<?> setPoints(
+            @PathVariable String login,
+            @PathVariable int amount) {
+        try {
+            usersService.setPoints(login, amount);
+            return ResponseEntity.ok("Points set to: " + amount);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/users/{login}/points/add/{amount}")
+    public ResponseEntity<?> addPoints(
+            @PathVariable String login,
+            @PathVariable int amount) {
+        try {
+            usersService.addPoints(login, amount);
+            return ResponseEntity.ok("Added +" + amount + " points");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/users/{login}/points/subtract/{amount}")
+    public ResponseEntity<?> subtractPoints(
+            @PathVariable String login,
+            @PathVariable int amount) {
+        try {
+            usersService.subtractPoints(login, amount);
+            return ResponseEntity.ok("Subtracted -" + amount + " points");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+// =============== TOP USERS ===============
+
+
+    @GetMapping("/top3")
+    public ResponseEntity<List<Users>> getTop3Users() {
+        return ResponseEntity.ok(usersService.getTop3Users());
+    }
 
 
 
 
-    
+
 
     @GetMapping("/A/abilities")
     public ResponseEntity<List<Abilities>> getAllAbilities() {

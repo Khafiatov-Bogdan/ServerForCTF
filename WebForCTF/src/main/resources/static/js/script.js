@@ -26,7 +26,7 @@ function generateTop3Leaderboard() {
 
     top3List.innerHTML = '';
 
-    fetch('/api/users/top')
+    fetch('http://localhost:8081/top3')
         .then(response => response.json())
         .then(users => {
 
@@ -268,41 +268,42 @@ function generateFullLeaderboard() {
     const fullList = document.getElementById('leaderboardFull');
     if (!fullList) return;
 
-    // Запрашиваем всех пользователей с сервера
-    fetch('/api/users/all')
+    // Запрашиваем активные сессии с сервера
+    fetch('/api/sessions')
         .then(response => response.json())
-        .then(users => {
+        .then(sessions => {
             fullList.innerHTML = '';
 
-            users.forEach((user, index) => {
+            if (sessions.length === 0) {
+                fullList.innerHTML = '<div class="no-users-message">Нет активных пользователей</div>';
+                return;
+            }
+
+            sessions.forEach((session, index) => {
+                const username = session.username || '(аноним)';
+                const shortId = session.sessionId.substring(0, 8);
+
                 const leaderItem = document.createElement('div');
-                leaderItem.className = `leader-item ${index >= 3 ? 'regular' : ''}`;
+                leaderItem.className = 'leader-item';
                 leaderItem.style.animationDelay = `${(index % 10) * 0.1}s`;
 
                 leaderItem.innerHTML = `
-                    <div class="leader-rank">${index + 1}</div>
+                    <div class="leader-rank">•</div>
                     <div class="leader-info">
-                        <div class="leader-name">${user.username}</div>
-                        <div class="leader-stats">${user.score || 0} pts</div>
+                        <div class="leader-name">${username}</div>
+                        <div class="leader-stats">session: ${shortId}</div>
                     </div>
                 `;
-
-                leaderItem.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                    console.log(`Clicked on: ${user.username}`);
-                });
 
                 fullList.appendChild(leaderItem);
             });
         })
         .catch(error => {
-            console.error('Error fetching all users:', error);
+            console.error('Error fetching active sessions:', error);
             fullList.innerHTML = '<div class="no-users-message">Ошибка загрузки данных</div>';
         });
 }
+
 
 function createParticles() {
     const particlesContainer = document.querySelector('.particles');

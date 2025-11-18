@@ -39,18 +39,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // разрешаем всем
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/top3").permitAll() // разрешаем всем
                         .requestMatchers("/debug/**").permitAll()
-                        .requestMatchers("/debug/users/**").hasRole("SUPERUSER")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()  // остальное защищаем
                 )
 
                 .httpBasic(Customizer.withDefaults()); // заменяем устаревший вызов
 
         return http.build();
+    }
+    @Configuration
+    public class CorsConfig implements WebMvcConfigurer {
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:3000")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowCredentials(true);
+        }
     }
 
 

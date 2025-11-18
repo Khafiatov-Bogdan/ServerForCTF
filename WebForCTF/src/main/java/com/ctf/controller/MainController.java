@@ -27,17 +27,36 @@ public class MainController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private com.ctf.session.SessionRegistry sessionRegistry;
+
 
     @GetMapping("/")
     public String home(Model model, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        model.addAttribute("currentUser", currentUser);
+        Boolean isAuthenticated = (Boolean) session.getAttribute("isAuthenticated");
+        String username = (String) session.getAttribute("username");
 
-
-        List<User> topUsers = userService.getTopUsers();
-        model.addAttribute("topUsers", topUsers);
+        model.addAttribute("isAuthenticated", isAuthenticated != null && isAuthenticated);
+        model.addAttribute("username", username);
 
         return "index";
+    }
+
+    @GetMapping("/top3")
+    @ResponseBody
+    public List<Map<String, Object>> getTop3() {
+        String backendUrl = "http://backend:8080/top3";
+
+        try {
+            RestTemplate rest = new RestTemplate();
+            ResponseEntity<List> response = rest.getForEntity(backendUrl, List.class);
+
+            return response.getBody(); // JSON → JS
+        } catch (Exception e) {
+            return List.of(
+                    Map.of("login", "ERROR", "points", 0)
+            );
+        }
     }
 
 
@@ -63,8 +82,10 @@ public class MainController {
             Model model) {
 
         try {
-            logger.info("LOGIN ATTEMPT: username={}", username);
+            Logger logger = LoggerFactory.getLogger(MainController.class);
+            logger.info("LOGIN ATTEMPT: username={} sessionID={}", username, session.getId());
 
+            // Формируем тело запроса к API
             Map<String, String> payload = Map.of(
                     "login", username,
                     "password", password
@@ -76,34 +97,63 @@ public class MainController {
             HttpEntity<Map<String, String>> entity = new HttpEntity<>(payload, headers);
             RestTemplate restTemplate = new RestTemplate();
 
+            // Отправляем POST на Spring Security API
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    "http://backend:8080/api/auth/login",
+                    "http://backend:8080/api/auth/login", // backend URL
                     entity,
                     String.class
             );
 
             if (response.getStatusCode().is2xxSuccessful()) {
+                // Авторизация успешна
                 session.setAttribute("username", username);
-                logger.info("LOGIN SUCCESS: username={}", username);
+                session.setAttribute("isAuthenticated", true);
+
+                sessionRegistry.registerSession(session.getId(), username);
+                logger.info("SESSION REGISTERED: {} -> {}", session.getId(), username);
+
+
+                logger.info("LOGIN SUCCESS: username={} sessionID={}", username, session.getId());
+                logger.info("SESSION ATTRIBUTES: username={}, isAuthenticated={}",
+                        session.getAttribute("username"),
+                        session.getAttribute("isAuthenticated"));
+
                 return "redirect:/";
             } else {
-                logger.warn("LOGIN FAILED: username={} status={}", username, response.getStatusCode());
+                logger.warn("LOGIN FAILED: username={} sessionID={} status={}",
+                        username, session.getId(), response.getStatusCode());
                 model.addAttribute("error", "Неверный логин или пароль");
-                model.addAttribute("isLogin", true); // показать форму входа
+                model.addAttribute("isLogin", true);
                 return "auth";
             }
 
         } catch (HttpClientErrorException.Unauthorized e) {
-            logger.warn("LOGIN FAILED: username={} reason=401 Unauthorized", username);
+            Logger logger = LoggerFactory.getLogger(MainController.class);
+            logger.warn("LOGIN FAILED: username={} reason=401 Unauthorized sessionID={}",
+                    username, session.getId());
             model.addAttribute("error", "Неверный логин или пароль");
-            model.addAttribute("isLogin", true); // показать форму входа
+            model.addAttribute("isLogin", true);
             return "auth";
         } catch (Exception e) {
-            logger.error("LOGIN ERROR: username={} exception={}", username, e.getMessage());
+            Logger logger = LoggerFactory.getLogger(MainController.class);
+            logger.error("LOGIN ERROR: username={} exception={} sessionID={}",
+                    username, e.getMessage(), session.getId());
             model.addAttribute("error", "Ошибка при входе: " + e.getMessage());
             model.addAttribute("isLogin", true);
             return "auth";
         }
+    }
+
+
+    @GetMapping("/api/sessions")
+    @ResponseBody
+    public List<Map<String, String>> getActiveSessions() {
+        return sessionRegistry.getActiveSessions().entrySet().stream()
+                .map(e -> Map.of(
+                        "sessionId", e.getKey(),
+                        "username", e.getValue()
+                ))
+                .toList();
     }
 
 
@@ -211,9 +261,11 @@ public class MainController {
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
+        sessionRegistry.removeSession(session.getId());
         session.invalidate();
         return "redirect:/";
     }
+
 
     @GetMapping("/debug")
     public String debugPage(Model model) {

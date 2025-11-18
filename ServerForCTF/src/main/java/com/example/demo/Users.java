@@ -18,14 +18,15 @@ public class Users {
     private String password;
 
     @Column(nullable = false)
-    private String role = "USER"; // по умолчанию обычный пользователь
+    private int points = 0;
+
 
     public Users() {}
 
     public Users(String login, String password, String role) {
         this.login = login;
         this.password = password;
-        this.role = role;
+        this.points = points;
     }
 
     public Long getId() { return id; }
@@ -36,15 +37,16 @@ public class Users {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+
+
+    public int getPoints() { return points; }
+    public void setPoints(int points) { this.points = points; }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", login='" + login + '\'' +
-                ", role='" + role + '\'' +
                 '}';
     }
 }

@@ -16,8 +16,9 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String defaultLogin = "user";
         String defaultPassword = "123456";
+        int defaultPoints = 0;
 
-        usersService.createOrUpdateUser(defaultLogin, defaultPassword);
+        usersService.createOrUpdateUser(defaultLogin, defaultPassword, defaultPoints);
         System.out.println("Дефолтный пользователь установлен: " + defaultLogin);
     }
 
