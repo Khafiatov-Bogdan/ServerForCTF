@@ -116,12 +116,16 @@ public class Base {
 
 // =============== TOP USERS ===============
 
-
     @GetMapping("/top3")
-    public ResponseEntity<List<Users>> getTop3Users() {
-        return ResponseEntity.ok(usersService.getTop3Users());
-    }
+    public ResponseEntity<List<Users.UserNamePointsDTO>> getTop3Users() {
+        List<Users> top = usersService.getTop3Users();
 
+        List<Users.UserNamePointsDTO> dto = top.stream()
+                .map(u -> new Users.UserNamePointsDTO(u.getLogin(), u.getPoints()))
+                .toList();
+
+        return ResponseEntity.ok(dto);
+    }
 
     @GetMapping("/allNames")
     public ResponseEntity<List<Users.UserNamePointsDTO>> getAllNames() {

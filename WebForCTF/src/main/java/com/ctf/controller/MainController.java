@@ -28,7 +28,7 @@ public class MainController {
     private UserService userService;
 
     @Autowired
-    private com.ctf.session.SessionRegistry sessionRegistry;
+    private com.ctf.SessionRegistry sessionRegistry;
 
 
     @GetMapping("/")
@@ -71,6 +71,19 @@ public class MainController {
         return "auth";
     }
 
+    @GetMapping("/admin-users.html")
+    public String adminUsers(HttpSession session, Model model) {
+        String username = (String) session.getAttribute("username");
+
+        if (username == null || !"admin".equalsIgnoreCase(username)) {
+            // Если пользователь не админ, редиректим на главную или страницу логина
+            return "redirect:/auth";
+        }
+
+        // Если админ, отдаем страницу admin-users.html
+        model.addAttribute("currentUser", username);
+        return "admin-users"; // Thymeleaf будет искать admin-users.html
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
@@ -86,8 +99,6 @@ public class MainController {
             return "auth";
         }
         try {
-
-
             Logger logger = LoggerFactory.getLogger(MainController.class);
             logger.info("LOGIN ATTEMPT: username={} sessionID={}", username, session.getId());
 
@@ -105,7 +116,7 @@ public class MainController {
 
             // Отправляем POST на Spring Security API
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    "http://backend:8080/api/auth/login", // backend URL
+                    "http://backend:8080/api/auth/login",
                     entity,
                     String.class
             );
@@ -117,14 +128,18 @@ public class MainController {
 
                 sessionRegistry.registerSession(session.getId(), username);
                 logger.info("SESSION REGISTERED: {} -> {}", session.getId(), username);
-
-
                 logger.info("LOGIN SUCCESS: username={} sessionID={}", username, session.getId());
                 logger.info("SESSION ATTRIBUTES: username={}, isAuthenticated={}",
                         session.getAttribute("username"),
                         session.getAttribute("isAuthenticated"));
 
-                return "redirect:/";
+                // Проверяем, админ ли это
+                if ("admin".equalsIgnoreCase(username)) {
+                    return "redirect:/admin-users.html"; // редирект для админа
+                } else {
+                    return "redirect:/"; // обычный пользователь
+                }
+
             } else {
                 logger.warn("LOGIN FAILED: username={} sessionID={} status={}",
                         username, session.getId(), response.getStatusCode());
@@ -149,6 +164,7 @@ public class MainController {
             return "auth";
         }
     }
+
 
 
     @GetMapping("/api/sessions")

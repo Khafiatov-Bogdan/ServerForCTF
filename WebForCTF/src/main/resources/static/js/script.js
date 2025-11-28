@@ -32,12 +32,10 @@ function generateTop3Leaderboard() {
 
             const topUsers = users.slice(0, 3);
 
-
             if (topUsers.length === 0) {
                 top3List.innerHTML = '<div class="no-users-message">Нет данных о пользователях</div>';
                 return;
             }
-
 
             topUsers.forEach((user, index) => {
                 const leaderItem = document.createElement('div');
@@ -47,8 +45,8 @@ function generateTop3Leaderboard() {
                 leaderItem.innerHTML = `
                     <div class="leader-rank">${index + 1}</div>
                     <div class="leader-info">
-                        <div class="leader-name">${user.username}</div>
-                        <div class="leader-stats">${user.score || 0} pts</div>
+                        <div class="leader-name">${user.name}</div>
+                        <div class="leader-stats">${user.points || 0} pts</div>
                     </div>
                 `;
 
@@ -57,7 +55,7 @@ function generateTop3Leaderboard() {
                     setTimeout(() => {
                         this.style.transform = '';
                     }, 150);
-                    console.log(`Clicked on: ${user.username}`);
+                    console.log(`Clicked on: ${user.name}`);
                 });
 
                 top3List.appendChild(leaderItem);
