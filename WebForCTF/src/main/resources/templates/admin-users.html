@@ -5,8 +5,31 @@
   <title>Управление пользователями</title>
   <link rel="stylesheet" href="/static/css/style.css">
   <style>
-    .user-card { display: flex; align-items: center; justify-content: space-between; padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 8px; }
-    .leader-actions button { margin-left: 5px; padding: 5px 10px; cursor: pointer; }
+    .user-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+    .leader-actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .leader-actions input {
+        width: 60px;
+        padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #999;
+        text-align: center;
+    }
+    .leader-actions button {
+        padding: 5px 10px;
+        cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -29,39 +52,47 @@
 
           container.innerHTML = '';
           users.forEach(user => {
-            const card = document.createElement('div');
-            card.className = 'user-card';
-            card.innerHTML = `
-                <span><b>${user.name}</b> - <span id="points-${user.name}">${user.points}</span> pts</span>
-                <div class="leader-actions">
-                    <button onclick="changePoints('${user.name}', 1)">+1</button>
-                    <button onclick="changePoints('${user.name}', -1)">-1</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
+              const card = document.createElement('div');
+              card.className = 'user-card';
+              card.innerHTML = `
+                  <span><b>${user.name}</b> - <span id="points-${user.name}">${user.points}</span> pts</span>
+                  <div class="leader-actions">
+                      <input type="number" id="input-${user.name}" placeholder="Баллы">
+                      <button onclick="applyPoints('${user.name}')">Применить</button>
+                  </div>
+              `;
+              container.appendChild(card);
+          });
       } catch (err) {
           console.error(err);
           container.innerHTML = '<p>Ошибка загрузки пользователей</p>';
       }
   }
 
-  async function changePoints(username, delta) {
-    const url = `http://localhost:3000/points/update?username=${username}&amount=${delta}`;
+  async function applyPoints(username) {
+      const inputEl = document.getElementById(`input-${username}`);
+      const delta = parseInt(inputEl.value);
 
-    try {
-        const res = await fetch(url, { method: 'POST' });
-        const data = await res.json();
+      if (isNaN(delta) || delta === 0) {
+          alert('Введите число, отличное от 0');
+          return;
+      }
 
-        const pointsEl = document.getElementById(`points-${username}`);
-        if (pointsEl) pointsEl.innerText = parseInt(pointsEl.innerText) + delta;
+      const url = `http://localhost:3000/points/update?username=${username}&amount=${delta}`;
 
-    } catch (err) {
-        console.error(err);
-        alert('Ошибка при изменении очков');
-    }
-}
+      try {
+          const res = await fetch(url, { method: 'POST' });
+          const data = await res.json();
 
+          const pointsEl = document.getElementById(`points-${username}`);
+          if (pointsEl) pointsEl.innerText = parseInt(pointsEl.innerText) + delta;
+
+          inputEl.value = '';
+      } catch (err) {
+          console.error(err);
+          alert('Ошибка при изменении очков');
+      }
+  }
 
   document.addEventListener('DOMContentLoaded', loadUsers);
 </script>

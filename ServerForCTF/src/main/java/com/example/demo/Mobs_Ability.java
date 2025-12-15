@@ -1,4 +1,5 @@
 package com.example.demo;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,4 +17,29 @@ public class Mobs_Ability {
     @JoinColumn(name = "ability_id")
     private Abilities ability;
 
+    // ======= Геттеры и сеттеры =======
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Mobs getMobs() {
+        return mobs;
+    }
+
+    public void setMobs(Mobs mobs) {
+        this.mobs = mobs;
+    }
+
+    public Abilities getAbility() {
+        return ability;
+    }
+
+    public void setAbility(Abilities ability) {
+        this.ability = ability;
+    }
 }
