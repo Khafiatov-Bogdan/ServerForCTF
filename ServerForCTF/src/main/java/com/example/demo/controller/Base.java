@@ -27,7 +27,10 @@ public class Base {
     private MobsAbilityService mobsAbilityService;
 
 
-
+    @GetMapping("/test")
+    public String test() {
+        return "Server is alive!";
+    }
 
 
     @GetMapping("/A/abilities")
